@@ -1,4 +1,5 @@
 from django.shortcuts import render , HttpResponse
+from django.http import FileResponse
 from resume_creator.models import Resume
 from resume_creator.forms import ResumeForm
 from django.contrib.auth.decorators import login_required
@@ -17,11 +18,10 @@ def ResumeListView(request):
 @login_required
 def ResumeCreateView(request):
     if request.method == "POST":
-        form = ResumeForm(request.POST)
+        form = ResumeForm(request.POST, request.FILES)
         if form.is_valid():
             resume = form.save(commit=False)
             resume.text = form.cleaned_data.get("text")
-            resume.pict = form.cleaned_data.get("pict")
             resume.creator = request.user
             resume.save()
             return HttpResponse("succeed", status=200)
@@ -29,6 +29,22 @@ def ResumeCreateView(request):
         form = ResumeForm()
         return render(request, "resume_creator/resume_form.html", context={ "form" : form })
     
-def ResumeFileCreateView(request):
-    user = request.user
+def ResumeFileCreateView(request, pk):
+    resume = Resume.objects.get(id=pk)
+    resume_text = resume.text
+    fpath = f"pdf_files/{request.user}.pdf"
+    pdf = FPDF()
+    pdf.set_font('Arial', 'B', 16)
+    pdf.add_page()
+    pict_x, pict_y, pict_w = 10, 15, 50
+
+    if resume.pict :
+        pdf.image(resume.pict.path, x=pict_x, y=pict_y, w=pict_w)
+    else:
+        print("empty")
+    pdf.set_xy(pict_x + pict_w, pict_y)
+    pdf.multi_cell(w=100, text= f'{resume_text}')
+    pdf.output(fpath, 'F')
+
+    return FileResponse(open(fpath, "rb"),as_attachment=True, filename=f"{request.user}.pdf")
     

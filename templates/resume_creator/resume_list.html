@@ -1,3 +1,8 @@
+<a href="{% url 'resume-create'%}">Створити резюме</a>
 {% for resume in resumes.all %}
-    <p>{{resume.creator}}</p>
+    <form action="{% url 'resume-file-get' resume.id%}" method="get">
+        {% csrf_token %}
+        <p>{{resume.creator}}</p>
+        <button type="submit">Завантажити</button>
+    </form>
 {% endfor %}
