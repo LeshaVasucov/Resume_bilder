@@ -31,17 +31,20 @@ def ResumeCreateView(request):
     
 def ResumeFileCreateView(request, pk):
     resume = Resume.objects.get(id=pk)
-    resume_text = resume.text
+    resume_text = resume.description
     fpath = f"pdf_files/{request.user}.pdf"
+
     pdf = FPDF()
-    pdf.set_font('Arial', 'B', 16)
+    pdf.add_font('DejaVu', '', 'media/fonts/DejaVuSans.ttf', uni=True)
+    pdf.set_font('DejaVu', '', 14)
     pdf.add_page()
     pict_x, pict_y, pict_w = 10, 15, 50
 
     if resume.pict :
         pdf.image(resume.pict.path, x=pict_x, y=pict_y, w=pict_w)
     else:
-        print("empty")
+        pdf.image("media/user.png", x=pict_x, y=pict_y, w=pict_w)
+
     pdf.set_xy(pict_x + pict_w, pict_y)
     pdf.multi_cell(w=100, text= f'{resume_text}')
     pdf.output(fpath, 'F')

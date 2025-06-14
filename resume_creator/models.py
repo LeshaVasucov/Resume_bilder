@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 
 class Resume(models.Model):
     creator = models.ForeignKey(User,on_delete=models.CASCADE, related_name="creator")
-    text = models.TextField()
+    description = models.TextField()
     pict = models.FileField(upload_to="resumes/" ,blank=True)
 
     def __str__(self):
