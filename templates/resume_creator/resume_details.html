@@ -1,0 +1,11 @@
+<p>{{resume.creator}}</p>
+<p>{{resume.description}}</p>
+{% if resume.pict %}
+    <img src="{{ resume.pict.url }}">
+{% else%}
+    <p>no pict</p>  
+{% endif %}
+<form action="{% url 'resume-file-get' resume.id%}" method="get">
+    {% csrf_token %}
+    <button type="submit">Завантажити</button>
+</form>

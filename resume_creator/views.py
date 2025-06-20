@@ -15,6 +15,13 @@ def ResumeListView(request):
     }
     return render(request, "resume_creator/resume_list.html", context)
 
+def ResumeDetails(request, pk):
+    resume = Resume.objects.get(id=pk)
+    context = {
+        "resume" : resume
+    }
+    return render(request, "resume_creator/resume_details.html", context=context)
+
 @login_required
 def ResumeCreateView(request):
     if request.method == "POST":
