@@ -1,10 +1,19 @@
 <p>{{resume.creator}}</p>
 <p>{{resume.description}}</p>
 {% if resume.pict %}
-    <img src="{{ resume.pict.url }}">
+    <img src="{{ resume.pict.url }} " alt="Фото" width="300">
 {% else%}
     <p>no pict</p>  
 {% endif %}
+<form action="{% url 'attachment-create' resume.id %}" method="post">
+    {% csrf_token %}
+    {{ attachment_form.as_p }}
+    <button type="submit">Додати</button>
+</form>
+{% for attachment in resume.attachments.all%}
+    <p>{{attachment.title}}</p>
+    <p>{{attachment.description}}</p>
+{% endfor %}
 <form action="{% url 'resume-file-get' resume.id%}" method="get">
     {% csrf_token %}
     <button type="submit">Завантажити</button>
