@@ -5,11 +5,18 @@
 {% else%}
     <p>no pict</p>  
 {% endif %}
-<form action="{% url 'attachment-create' resume.id %}" method="post">
-    {% csrf_token %}
-    {{ attachment_form.as_p }}
-    <button type="submit">Додати</button>
+<form method="get">
+    {{ filter_form.category.label_tag }}
+    {{ filter_form.category }}
+    <button type="submit">Фильтр</button>
 </form>
+{% if attachment_form %}
+    <form action="{% url 'attachment-create' resume.id category %}" method="post">
+        {% csrf_token %}
+        {{ attachment_form.as_p }}
+        <button type="submit">Додати</button>
+    </form>
+{% endif %}
 {% for attachment in resume.attachments.all%}
     <p>{{attachment.title}}</p>
     <p>{{attachment.description}}</p>

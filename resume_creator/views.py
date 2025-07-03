@@ -1,7 +1,7 @@
 from django.shortcuts import render , redirect
-from django.http import FileResponse
+from django.http import FileResponse , HttpResponse
 from resume_creator.models import Resume
-from resume_creator.forms import ResumeForm, AttachmentForm
+from resume_creator.forms import ResumeForm, EducationForm, IndividualInfoForm, WorkExperienceForm, CategoryFilterForm
 from django.contrib.auth.decorators import login_required
 from fpdf import FPDF
 # Create your views here.
@@ -17,9 +17,19 @@ def ResumeListView(request):
 
 def ResumeDetails(request, pk):
     resume = Resume.objects.get(id=pk)
+    category = request.GET.get("category", "")
+    attachment_form = 0
+    if category == "education" :
+        attachment_form = EducationForm()
+    elif category == "individual_info":
+        attachment_form = IndividualInfoForm()
+    elif category == "work_experience" :
+        attachment_form = WorkExperienceForm()
     context = {
         "resume" : resume,
-        "attachment_form" : AttachmentForm(),
+        "filter_form" : CategoryFilterForm(request.GET),
+        "attachment_form" : attachment_form ,
+        "category" : category
     }
     return render(request, "resume_creator/resume_details.html", context=context)
 
@@ -37,19 +47,24 @@ def ResumeCreateView(request):
         form = ResumeForm()
         return render(request, "resume_creator/resume_form.html", context={ "form" : form })
     
-def ResumeAttachmentCreateView(request, pk):
+def ResumeAttachmentCreateView(request, pk, category):
     if request.method == "POST":
-        resume = Resume.objects.get(id=pk)
-        form = AttachmentForm(request.POST)
+        if category == "education":
+            form = EducationForm(request.POST, request.FILES)
+        elif category == "individual_info":
+            form = IndividualInfoForm(request.POST, request.FILES)
+        elif category == "work_experience" :
+            form = WorkExperienceForm(request.POST, request.FILES)
+            
         if form.is_valid():
-            attacment = form.save()
-            resume.attachments.add(attacment)
-        else:
-            pass
-        return redirect("resume-details", pk=pk)
-    else:
-        form = AttachmentForm()
-
+            attachment = form.save()
+            attachment.category = category
+            resume = Resume.objects.get(id=pk)
+            resume.attachments.add(attachment)
+            attachment.save()
+            resume.save()
+            
+    return redirect("resume-details", pk=pk)
 def ResumeFileCreateView(request, pk):
     resume = Resume.objects.get(id=pk)
     resume_text = resume.description
