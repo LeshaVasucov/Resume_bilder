@@ -3,6 +3,7 @@ from django.http import FileResponse , HttpResponse
 from resume_creator.models import Resume
 from resume_creator.forms import ResumeForm, EducationForm, IndividualInfoForm, WorkExperienceForm, CategoryFilterForm
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from fpdf import FPDF
 # Create your views here.
 def ResumeListView(request):
@@ -61,10 +62,21 @@ def ResumeAttachmentCreateView(request, pk, category):
             attachment.category = category
             resume = Resume.objects.get(id=pk)
             resume.attachments.add(attachment)
-            attachment.save()
+            if attachment:
+                attachment.save()
             resume.save()
             
     return redirect("resume-details", pk=pk)
+
+def AttachmentDetails(request, pk, id):
+    resume = Resume.objects.get(id=pk)
+    attachment = resume.attachments.get(id=id)
+    context={
+        "attachment" : attachment
+    }
+    
+    return render(request, "resume_creator/attachment_details.html", context)
+
 def ResumeFileCreateView(request, pk):
     resume = Resume.objects.get(id=pk)
     resume_text = resume.description
@@ -82,19 +94,32 @@ def ResumeFileCreateView(request, pk):
         pdf.image("media/user.png", x=pict_x, y=pict_y, w=pict_w)
 
     #о себе
-    pdf.set_xy(pict_x + pict_w, pict_y)
-    pdf.multi_cell(w=100, h=50, text= f'{resume_text}')
+    pdf.set_xy(75,15)
+    pdf.multi_cell(w=100, h=25, text= f'{resume_text}',border=True)
 
     #вложения attachments всякие
-    attachment_x, attachment_y, attachment_w, attachment_h = pict_x + pict_w, pict_y + 60, 100,10
-    pdf.set_xy(attachment_x, attachment_y)
+    attachment_x = 10
+    pdf.set_y(75)
     for attachment in resume.attachments.all():
-        pdf.set_x(10)
-        pdf.multi_cell(w=attachment_w,h=attachment_h, text= f'{attachment.title}\n{attachment.description}',
-                       border=1, align='L')
-        attachment_y += attachment_h
-
+        pdf.set_x(attachment_x)
+        if attachment.category == "education" :
+            pdf.multi_cell(w=100, h=10, text=f'Освіта:\n{attachment.education}', border=True)
+        elif attachment.category == "work_experience" :
+            pdf.multi_cell(w=100, h=10, text=f"Досвід роботи:\nНазва роботи: {attachment.work_name} \nДосвід: {attachment.work_experience}", border=True)
+        elif attachment.category == "individual_info":
+            pdf.multi_cell(w=100, h=10, text=f"Контактна інформація:\nНомер телефону:{attachment.phone_number} \nEmail: {attachment.email} \nАдреса: {attachment.address}", border=True)
+        
     #создание
     pdf.output(fpath, 'F')
-    return FileResponse(open(fpath, "rb"),as_attachment=True, filename=f"{request.user}.pdf")
+    resume.file = fpath
+    
+    messages.success(request, "PDF-файл успішно збережено!")
+
+    return redirect("resume-details", pk=pk)
+
+
+
+
+
+    # return FileResponse(open(fpath, "rb"),as_attachment=True, filename=f"{request.user}.pdf")
     

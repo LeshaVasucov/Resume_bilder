@@ -1,0 +1,13 @@
+{% extends 'base.html'%}
+{% block content %}
+{% if attachment.category == "education"%}
+    <p>{{attachment.education}}</p>
+{% elif attachment.category == "individual_info"%}
+    <p>{{attachment.phone_number}}</p>
+    <p>{{attachment.address}}</p>
+    <p>{{attachment.email}}</p>
+{% elif attachment.category == "work_experience"%}
+    <p>{{attachment.work_name}}</p>
+    <p>{{attachment.work_experience}}</p>
+{% endif %}
+{% endblock %}

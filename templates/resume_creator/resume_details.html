@@ -1,27 +1,58 @@
-<p>{{resume.creator}}</p>
-<p>{{resume.description}}</p>
-{% if resume.pict %}
-    <img src="{{ resume.pict.url }} " alt="Фото" width="300">
-{% else%}
-    <p>no pict</p>  
-{% endif %}
-<form method="get">
-    {{ filter_form.category.label_tag }}
-    {{ filter_form.category }}
-    <button type="submit">Фильтр</button>
-</form>
-{% if attachment_form %}
-    <form action="{% url 'attachment-create' resume.id category %}" method="post">
-        {% csrf_token %}
-        {{ attachment_form.as_p }}
-        <button type="submit">Додати</button>
+{% extends 'base.html'%}
+{% block content %}
+<body>
+    <p>{{resume.creator}}</p>
+    <p>{{resume.description}}</p>
+    {% if resume.pict %}
+        <img src="{{ resume.pict.url }} " alt="Фото" width="300">
+    {% else%}
+        <p>no pict</p>  
+    {% endif %}
+    <form method="get" id="categoryForm">
+        {{ filter_form.category.label_tag }}
+        {{ filter_form.category }}
     </form>
+    {% if attachment_form %}
+        <form action="{% url 'attachment-create' resume.id category %}" method="post">
+            {% csrf_token %}
+            {{ attachment_form.as_p }}
+            <button type="submit">Додати</button>
+        </form>
+    {% endif %}
+    {% for attachment in resume.attachments.all%}
+        <div>
+            <a href="{% url 'attachment-details' resume.id attachment.id %}">
+                {{ attachment.get_category_display }}
+            </a>
+        </div>
+    {% endfor %}
+    <form action="{% url 'resume-file-get' resume.id%}" method="get">
+        {% csrf_token %}
+        <button type="submit">Зберегти</button>
+    </form>
+</body>
+{% if messages %}
+  <ul class="messages">
+    {% for message in messages %}
+      <li class="{{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+  </ul>
 {% endif %}
-{% for attachment in resume.attachments.all%}
-    <p>{{attachment.title}}</p>
-    <p>{{attachment.description}}</p>
-{% endfor %}
-<form action="{% url 'resume-file-get' resume.id%}" method="get">
-    {% csrf_token %}
-    <button type="submit">Завантажити</button>
-</form>
+{% endblock %}
+<script>
+const select = document.getElementById('categorySelect');
+const removedCategories = JSON.parse(localStorage.getItem('removedCategories') || '[]');
+
+for (let i = select.options.length - 1; i >= 0; i--) {
+    if (removedCategories.includes(select.options[i].value)) {
+      select.remove(i);
+    }
+}
+
+document.getElementById('myForm').addEventListener('submit', function() {
+    const selectedValue = select.value;
+    removedCategories.push(selectedValue);
+    localStorage.setItem('removedCategories', JSON.stringify(removedCategories));
+});
+
+</script>

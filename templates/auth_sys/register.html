@@ -1,5 +1,10 @@
+
+{% extends 'base.html'%}
+{% block content %}
+<a href="/login/">Авторизація</a>
 <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">Зареєструватись</button>
 </form>
+{% endblock %}

@@ -1,6 +1,9 @@
+{% extends 'base.html'%}
+{% block content %}
 <a href="{% url 'resume-create'%}">Створити резюме</a>
 {% for resume in resumes.all %}
     <div>
     <a href="{%url 'resume-details' resume.id %}">{{resume.creator}}</a>
     </div>
 {% endfor %}
+{% endblock %}
