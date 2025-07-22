@@ -5,6 +5,7 @@ from resume_creator.forms import ResumeForm, EducationForm, IndividualInfoForm, 
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from fpdf import FPDF
+from time import time
 # Create your views here.
 def ResumeListView(request):
     user = request.user.id
@@ -80,7 +81,7 @@ def AttachmentDetails(request, pk, id):
 def ResumeFileCreateView(request, pk):
     resume = Resume.objects.get(id=pk)
     resume_text = resume.description
-    fpath = f"pdf_files/{request.user}.pdf"
+    fpath = f"media/documents/{request.user}_{time()}.pdf"
 
     pdf = FPDF()
     pdf.add_font('DejaVu', '', 'media/fonts/DejaVuSans.ttf', uni=True)
@@ -111,15 +112,15 @@ def ResumeFileCreateView(request, pk):
         
     #создание
     pdf.output(fpath, 'F')
-    resume.file = fpath
+    print(fpath)
+    resume.file_path = fpath
+    resume.save()
     
     messages.success(request, "PDF-файл успішно збережено!")
-
+    print(resume.file_path)
     return redirect("resume-details", pk=pk)
-
-
-
-
-
-    # return FileResponse(open(fpath, "rb"),as_attachment=True, filename=f"{request.user}.pdf")
+    # return FileResponse(open(resume.file_path, 'rb'), content_type='application/pdf')
     
+def ResumeFileLoadView(request,pk):
+    resume = Resume.objects.get(id=pk)
+    return FileResponse(open(resume.file_path, 'rb'), as_attachment=True, content_type='application/pdf')

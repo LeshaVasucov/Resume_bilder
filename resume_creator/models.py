@@ -55,7 +55,7 @@ class Resume(models.Model):
     description = models.TextField()
     pict = models.ImageField(upload_to="resumes/" ,blank=True)
     attachments = models.ManyToManyField(Attachment, related_name="attachments")
-    file_path = models.FilePathField()
+    file_path = models.FilePathField(name="file_path")
 
     def __str__(self):
         return f"{self.creator}"
