@@ -22,10 +22,27 @@
                 </form>
             {% endif %}
             {% for attachment in resume.attachments.all%}
-                <div>
-                    <a href="{% url 'attachment-details' resume.id attachment.id %}">
+                <div class="attachment-block">
+                    <p class="toggle-button" style="cursor: pointer;">
                         {{ attachment.get_category_display }}
-                    </a>
+                    </p>
+                    <div class="attachment-hidden" style="display: none;">
+                        {% if attachment.category == "education" %}
+                            <p>Освіта : {{ attachment.education }}</p>
+                        {% elif attachment.category == "individual_info" %}
+                            <p>Номер телефону : {{ attachment.phone_number }}</p>
+                            <p>Адреса : {{ attachment.address }}</p>
+                            <p>Email : {{ attachment.email }}</p>
+                        {% elif attachment.category == "work_experience" %}
+                            <p>Робота : {{ attachment.work_name }}</p>
+                            <p>Досвід : {{ attachment.work_experience }}</p>
+                        {% elif attachment.category == "project" %}
+                            <p>Назва проекту : {{attachment.project_name}}</p>
+                            <p>Ідея проекту : {{attachment.project_idea}}</p>
+                            <p>Використані технології : {{attachment.used_technologies}}</p>
+                            <p>Гітхаб : {{attachment.github}}</p>
+                        {% endif %}
+                    </div>
                 </div>
             {% endfor %}
             <form action="{% url 'resume-file-get' resume.id%}" method="get">
@@ -49,6 +66,24 @@
             <iframe  src="{{resume.file_path}}" width="100%" height="100%" type="application/pdf"></iframe>
         </div>
     </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const toggleButtons = document.querySelectorAll(".toggle-button");
+
+        toggleButtons.forEach(function(button) {
+            button.addEventListener("click", function() {
+                const parent = button.closest(".attachment-block");
+                const hiddenDiv = parent.querySelector(".attachment-hidden");
+
+                if (hiddenDiv.style.display === "none" || hiddenDiv.style.display === "") {
+                    hiddenDiv.style.display = "block";
+                } else {
+                    hiddenDiv.style.display = "none";
+                }
+            });
+        });
+    });
+</script>
 </body>
 <!-- <iframe  src="https://mozilla.github.io/pdf.js/web/viewer.html?file=media/documents/admin.pdf" width="600" height="800" type="application/pdf"></iframe> -->
 {% endblock %}

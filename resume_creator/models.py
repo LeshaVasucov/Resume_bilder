@@ -36,6 +36,7 @@ CATEGORY_CHOICES = [
     ('education', 'Освіта'),
     ('individual_info', 'Інформація про себе'),
     ('work_experience','Досвід роботи'),
+    ('project', 'Проект')
 ]
 class Attachment(models.Model):
     category = models.CharField(choices=CATEGORY_CHOICES, max_length=30)
@@ -48,7 +49,17 @@ class Attachment(models.Model):
     #WorkExperience
     work_name = models.CharField(max_length=60, blank=True)
     work_experience = models.CharField(max_length=70, blank=True)
+    #Projects
+    project_name = models.CharField(max_length=60, blank=True)
+    project_idea = models.TextField(blank=True)
+    used_technologies = models.TextField(blank=True)
+    github = models.URLField(blank=True)
 
+
+TYPE_CHOICES = [
+    ("base", "Звичайний"),
+    ("classic", "Класичний")
+]
 
 class Resume(models.Model):
     creator = models.ForeignKey(User,on_delete=models.CASCADE, related_name="creator")
@@ -56,6 +67,7 @@ class Resume(models.Model):
     pict = models.ImageField(upload_to="resumes/" ,blank=True)
     attachments = models.ManyToManyField(Attachment, related_name="attachments")
     file_path = models.FilePathField(name="file_path")
+    type = models.CharField(choices=TYPE_CHOICES, max_length=30, blank=True)
 
     def __str__(self):
         return f"{self.creator}"

@@ -1,7 +1,7 @@
 from django.shortcuts import render , redirect
 from django.http import FileResponse , HttpResponse
 from resume_creator.models import Resume
-from resume_creator.forms import ResumeForm, EducationForm, IndividualInfoForm, WorkExperienceForm, CategoryFilterForm
+from resume_creator.forms import ResumeForm, EducationForm, IndividualInfoForm, WorkExperienceForm, ProjectForm, CategoryFilterForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from fpdf import FPDF
@@ -27,6 +27,8 @@ def ResumeDetails(request, pk):
         attachment_form = IndividualInfoForm()
     elif category == "work_experience" :
         attachment_form = WorkExperienceForm()
+    elif category == "project":
+        attachment_form = ProjectForm()
     context = {
         "resume" : resume,
         "filter_form" : CategoryFilterForm(request.GET),
@@ -43,6 +45,7 @@ def ResumeCreateView(request):
             resume = form.save(commit=False)
             resume.text = form.cleaned_data.get("text")
             resume.creator = request.user
+            resume.type = "base"
             resume.save()
             return redirect("resume-list")
     else:
@@ -57,7 +60,8 @@ def ResumeAttachmentCreateView(request, pk, category):
             form = IndividualInfoForm(request.POST, request.FILES)
         elif category == "work_experience" :
             form = WorkExperienceForm(request.POST, request.FILES)
-            
+        elif category == "project":
+            form = ProjectForm(request.POST, request.FILES)
         if form.is_valid():
             attachment = form.save()
             attachment.category = category
@@ -87,6 +91,8 @@ def ResumeFileCreateView(request, pk):
     pdf.add_font('DejaVu', '', 'media/fonts/DejaVuSans.ttf', uni=True)
     pdf.set_font('DejaVu', '', 14)
     pdf.add_page()
+    pdf.set_fill_color(r=0,g=0,b=0)
+    pdf.rect(h=pdf.h, w=100, x=0, y=0, style="DF")
     pict_x, pict_y, pict_w = 10, 15, 50
     #аватарка 
     if resume.pict :
@@ -95,20 +101,28 @@ def ResumeFileCreateView(request, pk):
         pdf.image("media/user.png", x=pict_x, y=pict_y, w=pict_w)
 
     #о себе
-    pdf.set_xy(75,15)
-    pdf.multi_cell(w=100, h=25, text= f'{resume_text}',border=True)
-
+    pdf.set_xy(105,15)
+    pdf.multi_cell(w=100, h=10, text= f'Про себе : \n{resume_text}',border=True)
+    #проекты
+    pdf.set_font('DejaVu', '', 12)
+    for attachment in resume.attachments.all():
+        if attachment.category == "project":
+            pdf.set_xy(105,pdf.y+10)
+            pdf.multi_cell(w=100, h=10, text= f'{attachment.project_name}\nІдея проекту : {attachment.project_idea}\nBикopиcтaнi технології : {attachment.used_technologies}\nGithub: {attachment.github}',border=True)
     #вложения attachments всякие
+    pdf.set_text_color(236, 224, 113)
     attachment_x = 10
-    pdf.set_y(75)
+    pdf.set_y(70)
+    pdf.set_font('DejaVu', '', 14)
     for attachment in resume.attachments.all():
         pdf.set_x(attachment_x)
-        if attachment.category == "education" :
-            pdf.multi_cell(w=100, h=10, text=f'Освіта:\n{attachment.education}', border=True)
-        elif attachment.category == "work_experience" :
-            pdf.multi_cell(w=100, h=10, text=f"Досвід роботи:\nНазва роботи: {attachment.work_name} \nДосвід: {attachment.work_experience}", border=True)
+        pdf.set_y(pdf.y+5)
+        if attachment.category == "work_experience" :
+            pdf.multi_cell(w=90, h=10, text=f"Досвід роботи : \nНазва роботи : {attachment.work_name} \nДосвід : {attachment.work_experience}", border=True)
+        elif attachment.category == "education" :
+            pdf.multi_cell(w=90, h=10, text=f'Освіта : \n{attachment.education}', border=True)
         elif attachment.category == "individual_info":
-            pdf.multi_cell(w=100, h=10, text=f"Контактна інформація:\nНомер телефону:{attachment.phone_number} \nEmail: {attachment.email} \nАдреса: {attachment.address}", border=True)
+            pdf.multi_cell(w=90, h=10, text=f"Контактна інформація : \nНомер телефону : {attachment.phone_number} \nEmail : {attachment.email} \nАдреса : {attachment.address}", border=True)
         
     #создание
     pdf.output(fpath, 'F')

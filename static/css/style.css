@@ -4,3 +4,12 @@
   width: 100vw;
   height: 100vh;
 }
+
+.attachment-block {
+  border: 1px solid #ccc;
+}
+
+.toggle-button{
+  color: #007bff;
+}
+

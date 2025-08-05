@@ -60,6 +60,35 @@ class IndividualInfoForm(forms.ModelForm):
                 'placeholder': 'Адреса',
                 'required': 'required'
             }),}
+        
+
+class ProjectForm(forms.ModelForm):
+    class Meta():
+        model = models.Attachment
+        fields = ["project_name",  "project_idea", "used_technologies", "github"]
+        widgets = {
+            'project_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Назва проекту',
+                'required': 'required'
+            }),
+            'project_idea': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Суть проекту',
+                'required': 'required'
+            }),
+            'used_technologies': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Використані технології',
+                'required': 'required'
+            }),
+            'github': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Посилання на гітхаб',
+                'required': 'required'
+            })}
+        
+
 class CategoryFilterForm(forms.Form):
     category = forms.ChoiceField(choices=models.CATEGORY_CHOICES, required=False, label="Категорія", 
                                  widget=forms.Select(attrs={
