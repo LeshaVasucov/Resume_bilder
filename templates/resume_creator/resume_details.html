@@ -1,8 +1,12 @@
 {% extends 'base.html'%}
 {% block content %}
+<head>
+    <title>Деталі резюме</title>
+</head>
 <body>
     <div class="container">
         <div class="all_forms">
+            <a href="/" class="btn">На головну сторінку</a>
             <p>{{resume.creator}}</p>
             <p>{{resume.description}}</p>
             {% if resume.pict %}

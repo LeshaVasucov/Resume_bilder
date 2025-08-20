@@ -2,9 +2,25 @@ from django import forms
 from resume_creator import models
 
 class ResumeForm(forms.ModelForm):
-    class Meta():
+    class Meta:
         model = models.Resume
         fields = ["description", "pict"]
+        labels = {
+            "description": "Спочатку напишить про себе",
+            "pict": "Фото (не обов`язково)",
+        }
+        widgets = {
+            "description": forms.Textarea(attrs={
+                "class": "form-control",
+                "placeholder": "Напишить коротко про свої навички, інтереси, хоббі.",
+                "rows": 4,
+                "style": "resize: vertical;",
+            }),
+            "pict": forms.ClearableFileInput(attrs={
+                "class": "form-control-file",
+                "accept": "image/*",
+            }),
+        }
 
 
 # class AttachmentForm(forms.ModelForm):

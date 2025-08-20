@@ -9,7 +9,180 @@
   border: 1px solid #ccc;
 }
 
-.toggle-button{
+
+.all_forms {
+  padding: 20px;
+  overflow-y: auto; 
+  height: 100vh;
+  background-color: #f9f9f9;
+}
+
+
+.attachment-block {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px 15px;
+  margin: 10px 0;
+  background-color: #ffffff;
+  transition: box-shadow 0.2s;
+}
+
+.attachment-block:hover {
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+
+.toggle-button {
   color: #007bff;
+  font-weight: bold;
+  cursor: pointer;
+  margin-bottom: 5px;
+}
+
+.toggle-button:hover {
+  text-decoration: underline;
+}
+
+
+button {
+  background-color: #198754;
+  color: #ffffff;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  margin-top: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+button:hover {
+  background-color: #157347;
+}
+
+
+ul.messages {
+  list-style: none;
+  padding: 0;
+  margin-top: 15px;
+}
+
+ul.messages li {
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 5px;
+}
+
+ul.messages li.success {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+ul.messages li.error {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+
+select {
+  padding: 6px 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+}
+
+.resume-body {
+    background-color: #f4f7f9;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.resume-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.resume-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.resume-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333333;
+}
+
+.resume-create-btn {
+    background-color: #198754;
+    color: #ffffff;
+    text-decoration: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+}
+
+.resume-create-btn:hover {
+    background-color: #146c43;
+}
+
+.resume-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.resume-item {
+    background-color: #f9fbfd;
+    border: 1px solid #dee2e6;
+    padding: 15px;
+    border-radius: 6px;
+    text-decoration: none;
+    color: #212529;
+    transition: background-color 0.2s ease;
+}
+
+.resume-item:hover {
+    background-color: #e9ecef;
+}
+
+.resume-empty {
+    padding: 15px;
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+    border-radius: 6px;
+    color: #856404;
+    text-align: center;
+}
+
+.pdf {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  border-left: 1px solid #ccc;
+}
+
+.pdf iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden; 
 }
 

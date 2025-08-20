@@ -7,6 +7,7 @@ from django.contrib import messages
 from fpdf import FPDF
 from time import time
 # Create your views here.
+@login_required
 def ResumeListView(request):
     user = request.user.id
     print(user)
@@ -89,6 +90,8 @@ def ResumeFileCreateView(request, pk):
 
     pdf = FPDF()
     pdf.add_font('DejaVu', '', 'media/fonts/DejaVuSans.ttf', uni=True)
+    pdf.add_font('DejaVu', 'B', 'media/fonts/DejaVuSans-Bold.ttf', uni=True)
+    pdf.add_font('DejaVu', 'I', 'media/fonts/DejaVuSans-Oblique.ttf', uni=True)
     pdf.set_font('DejaVu', '', 14)
     pdf.add_page()
     pdf.set_fill_color(r=0,g=0,b=0)
@@ -102,13 +105,45 @@ def ResumeFileCreateView(request, pk):
 
     #о себе
     pdf.set_xy(105,15)
-    pdf.multi_cell(w=100, h=10, text= f'Про себе : \n{resume_text}',border=True)
+    pdf.multi_cell(w=100, h=8, text= f'Про себе : \n{resume_text}', border=False, align="L")
     #проекты
-    pdf.set_font('DejaVu', '', 12)
     for attachment in resume.attachments.all():
         if attachment.category == "project":
-            pdf.set_xy(105,pdf.y+10)
-            pdf.multi_cell(w=100, h=10, text= f'{attachment.project_name}\nІдея проекту : {attachment.project_idea}\nBикopиcтaнi технології : {attachment.used_technologies}\nGithub: {attachment.github}',border=True)
+            pdf.ln(8)            
+            pdf.set_x(105)       
+
+            # Заголовок проекта жирным синим
+            pdf.set_text_color(0, 102, 204)
+            pdf.set_font('DejaVu', 'B', 13)
+            pdf.cell(0, 8, f"Назва проекту: {attachment.project_name}", ln=True)
+
+            # Идея проекта
+            pdf.set_text_color(0, 0, 0)
+            pdf.set_font('DejaVu', '', 12)
+            pdf.set_x(105)
+            pdf.multi_cell(0, 7, f"Ідея проекту:\n{attachment.project_idea}")
+
+            pdf.ln(2)
+
+            # Технологии жирным
+            pdf.set_x(105)
+            pdf.set_font('DejaVu', 'B', 12)
+            pdf.cell(0, 7, "Використані технології:", ln=True)
+
+            pdf.set_x(105)
+            pdf.set_font('DejaVu', '', 12)
+            pdf.multi_cell(0, 7, attachment.used_technologies)
+
+            pdf.ln(2)
+
+            # GitHub 
+            pdf.set_x(105)
+            pdf.set_text_color(0, 102, 204)
+            pdf.set_font('DejaVu', 'I', 12)
+            pdf.cell(0, 7, f"GitHub: {attachment.github}", ln=True, link=attachment.github)
+
+            pdf.set_text_color(0, 0, 0)  # сброс цвета
+            pdf.ln(10)
     #вложения attachments всякие
     pdf.set_text_color(236, 224, 113)
     attachment_x = 10
@@ -118,11 +153,11 @@ def ResumeFileCreateView(request, pk):
         pdf.set_x(attachment_x)
         pdf.set_y(pdf.y+5)
         if attachment.category == "work_experience" :
-            pdf.multi_cell(w=90, h=10, text=f"Досвід роботи : \nНазва роботи : {attachment.work_name} \nДосвід : {attachment.work_experience}", border=True)
+            pdf.multi_cell(w=90, h=10, text=f"Досвід роботи : \nНазва роботи : {attachment.work_name} \nДосвід : {attachment.work_experience}", border=True, align="L")
         elif attachment.category == "education" :
-            pdf.multi_cell(w=90, h=10, text=f'Освіта : \n{attachment.education}', border=True)
+            pdf.multi_cell(w=90, h=10, text=f'Освіта : \n{attachment.education}', border=True, align="L")
         elif attachment.category == "individual_info":
-            pdf.multi_cell(w=90, h=10, text=f"Контактна інформація : \nНомер телефону : {attachment.phone_number} \nEmail : {attachment.email} \nАдреса : {attachment.address}", border=True)
+            pdf.multi_cell(w=90, h=10, text=f"Контактна інформація : \nНомер телефону : {attachment.phone_number} \nEmail : {attachment.email} \nАдреса : {attachment.address}", border=True, align="L")
         
     #создание
     pdf.output(fpath, 'F')

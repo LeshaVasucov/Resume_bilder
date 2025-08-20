@@ -1,9 +1,28 @@
-{% extends 'base.html'%}
+{% extends 'base.html' %}
 {% block content %}
-<a href="{% url 'resume-create'%}">Створити резюме</a>
-{% for resume in resumes.all %}
-    <div>
-    <a href="{%url 'resume-details' resume.id %}">{{resume.creator}}</a>
+<head>
+    <link rel="stylesheet" href="/static/css/resume_list.css">
+    <title>Мої Резюме</title>
+</head>
+
+<body class="resume-body">
+    <div class="resume-container">
+        <div class="resume-header">
+            <h2 class="resume-title">Мої резюме</h2>
+            <a href="{% url 'resume-create' %}" class="resume-create-btn">➕ Створити резюме</a>
+        </div>
+
+        {% if resumes.exists %}
+            <div class="resume-list">
+                {% for resume in resumes.all %}
+                    <a href="{% url 'resume-details' resume.id %}" class="resume-item">
+                        👤 {{ resume.creator }} — {{ resume.description|default:"(немає опису)"|truncatechars:60 }}
+                    </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="resume-empty">Немає жодного резюме.</div>
+        {% endif %}
     </div>
-{% endfor %}
+</body>
 {% endblock %}
